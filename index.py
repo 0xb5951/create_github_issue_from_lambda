@@ -25,7 +25,7 @@ def lambda_handler(event, content):
 
     post_message_to_slack(msg, event["event"]["channel"])
 
-    url = "http://api.github.com/repos/odrum428/create_github_issue_from_lambda/issues/?access_token=" + token
+    url = "https://api.github.com/repos/odrum428/create_github_issue_from_lambda/issues?access_token=" + token
     print(url)
     res = requests.post(url, create_issue)
     print(res)
