@@ -56,3 +56,13 @@ def update_dynamodb(title, owner, repo, body):
         return read_dynamodb(title, owner)
     except Exception as e:
         print(e)
+
+def get_issue_list():
+    try:
+        dynamodb = boto3.resource("dynamodb")
+        table = dynamodb.Table('github_issue')
+        res = table.scan()['Items']
+
+        return res
+    except Exception as e:
+        print(e)
