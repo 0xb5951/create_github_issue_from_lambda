@@ -39,6 +39,7 @@ https://github.com/settings/tokens/new でアクセストークンを生成す�
 ### プロジェクトファイル内だけをzip化してまとめる
 プロジェクトファイルの中身だけをzipファイルにしておく。
 
+## AWS
 ### IAMロールを作成する
 ここからAWSの設定を行っていく。AWSに登録するところは割愛。 まずはambda関数にアクセス許可を与えるためにロールを作成する。
 ロール名は適当につけてください。与える権限は以下の通り。
@@ -105,3 +106,8 @@ Lambda内で以下の環境変数を設定する。
 - GITHUB_ACCESS_TOKEN : GitHubのPersonal access token
 - SLACK_OAUTH_ACCESS_TOKEN : SlackのOAuth Access Token
 - SLACK_BOT_USER_ACCESS_TOKEN : SlackのBot User OAuth Access Token
+
+## LICENSE
+Copyright 2018 odrum428.
+
+Licensed under the MIT License.
