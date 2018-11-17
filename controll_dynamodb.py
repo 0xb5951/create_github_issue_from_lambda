@@ -9,7 +9,7 @@ def write_dynamodb(title, owner, repo, body):
         table = dynamoDB.Table("github_issue") # DynamoDBのテーブル名
 
         # DynamoDBへデータを書き込む
-        table.put_item(
+        res = table.put_item(
         Item = {
         "title": title, # primarykey : issueのタイトルを入れる
         "owner": owner, # sortedkey : owner情報を入れる
@@ -17,8 +17,9 @@ def write_dynamodb(title, owner, repo, body):
         "body": body # issueの中身を入れる
         }
         )
+        return res
     except Exception as e:
-        print(e)
+        return e
 
 def read_dynamodb(title, owner):
   try:
@@ -31,7 +32,7 @@ def read_dynamodb(title, owner):
     )
     return queryData
   except Exception as e:
-        print(e)
+      return e
 
 def update_dynamodb(title, owner, repo, body):
     try:
@@ -53,9 +54,9 @@ def update_dynamodb(title, owner, repo, body):
                 }
             }
         )
-        return read_dynamodb(title, owner)
+        return res
     except Exception as e:
-        print(e)
+        return e
 
 def get_issue_list():
     try:
@@ -65,4 +66,4 @@ def get_issue_list():
 
         return res
     except Exception as e:
-        print(e)
+        return e
