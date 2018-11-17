@@ -1,5 +1,4 @@
 # DynamoDBの処理をまとめて書いておく。
-
 import boto3
 from boto3.dynamodb.conditions import Key
 
@@ -10,12 +9,12 @@ def write_dynamodb(title, owner, repo, body):
 
         # DynamoDBへデータを書き込む
         res = table.put_item(
-        Item = {
-        "title": title, # primarykey : issueのタイトルを入れる
-        "owner": owner, # sortedkey : owner情報を入れる
-        "repo": repo,  # repositoryの名前
-        "body": body # issueの中身を入れる
-        }
+            Item = {
+                "title": title, # primarykey : issueのタイトルを入れる
+                "owner": owner, # sortedkey : owner情報を入れる
+                "repo": repo,  # repositoryの名前
+                "body": body # issueの中身を入れる
+                }
         )
         return res
     except Exception as e:

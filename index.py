@@ -1,21 +1,16 @@
 import json
 import os
-import logging
 import requests
-from urllib.request import urlopen, Request
-from urllib.parse import parse_qs
 
 from post_message_to_slack import post_message_to_slack
-from controll_dynamodb import write_dynamodb,read_dynamodb,update_dynamodb,get_issue_list
+from controll_dynamodb import write_dynamodb, read_dynamodb, update_dynamodb, get_issue_list
 
 #lambda function
 def lambda_handler(event, content):
-    print(event)
     token = os.environ["GITHUB_ACCESS_TOKEN"]
 
     # slackからの投稿を slack_input_text へ格納
     slack_text = str(event["event"]["text"]).split()
-    print(slack_text)
     command = slack_text[1]
 
     if command == "setting":
@@ -28,6 +23,7 @@ def lambda_handler(event, content):
             body += '\n'
 
         res = write_dynamodb(title, owner, repo, body)
+        print(res)
 
         if res['ResponseMetadata']['HTTPStatusCode'] == 200:
             msg = "DynamoDBへの書き込みに成功したよ！\n登録されているIssue一覧はget_issue_listで確認できるよ。\n"
@@ -53,7 +49,7 @@ def lambda_handler(event, content):
         if res['ResponseMetadata']['HTTPStatusCode'] == 200:
             msg = "登録されているIssue情報の上書きに成功したよ！\n登録されているIssue一覧はget_issue_listで確認できるよ。\n"
         else:
-            msg = "DynamoDBの上書きに失敗したよ！エラー内容は以下の通りだよ！\n" + res
+            msg = "DynamoDBの上書きに失敗したよ！エラー内容は以下の通りだよ！\n" + str(res)
 
         post_message_to_slack(msg, event["event"]["channel"])
         return
@@ -93,28 +89,28 @@ def lambda_handler(event, content):
         post_message_to_slack(msg, event["event"]["channel"])
         return
 
-
     elif command == "create":
         title = slack_text[2]
         owner = slack_text[3]
-        res = read_dynamodb(title, owner)['Items'][0]
+        res = read_dynamodb(title, owner)['Items']
+
         if not res:
             msg = "Issueの情報が登録されてないよ！作成したいIssueの情報を登録してね。\n" \
             "*使い方*\nissue情報の登録: このボットにメンションを飛ばして各種情報を入力してね。issueの中身はスペース区切りに入力することで改行できるよ。\n" \
             "コマンド例 `@このボット setting Issueのタイトル 作成先のowner 作成先のリポジトリ issueの中身...`\n"
+
             post_message_to_slack(msg, event["event"]["channel"])
             return
 
-        print(res)
-        msg = "Issueの作成先" + "\n" + "owner:" + res['owner'] + "\n" + "repo:" + res['repo']
+        msg = "Issueの作成先" + "\n" + "owner:" + res[0]['owner'] + "\n" + "repo:" + res[0]['repo']
         post_message_to_slack(msg, event["event"]["channel"])
 
-        post_url = "https://api.github.com/repos/" + res['owner'] + "/" + res['repo'] + "/issues?access_token=" + token
+        post_url = "https://api.github.com/repos/" + res[0]['owner'] + "/" + res[0]['repo'] + "/issues?access_token=" + token
 
         create_issue = {
-        "title": res['title'],
-        "body": res['body'],
-        # 'label': [] # お好みでlabelをつけて下さい
+            "title": res[0]['title'],
+            "body": res[0]['body']
+            # 'label': [] # お好みでlabelをつけて下さい
         }
 
         params = json.dumps(create_issue)
@@ -126,7 +122,11 @@ def lambda_handler(event, content):
         else:
             msg = "エラーが起こってるよ.ログを確認してみてね。"
 
-
         post_message_to_slack(msg, event["event"]["channel"])
 
         return ret.status_code
+
+    else:
+        msg = "そのコマンドは登録されてないよ！\n使えるコマンド一覧は`@このボット help`で確認することができるよ！"
+        post_message_to_slack(msg, event["event"]["channel"])
+        return
