@@ -12,7 +12,7 @@ def post_message_to_slack(message: str, channel: str):
         "Authorization": "Bearer {0}".format(os.environ["SLACK_BOT_USER_ACCESS_TOKEN"])
     }
     data = {
-        "token": os.environ["SLACK_APP_AUTH_TOKEN"],
+        "token": os.environ["SLACK_OAUTH_ACCESS_TOKEN"],
         "channel": channel,
         "text": message
     }
